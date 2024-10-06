@@ -1,0 +1,72 @@
+                                                              POSTFIX
+
+#Install  requirements:
+sudo apt update
+sudo apt install postfix -y
+apt-get install mailutils -y
+sudo service postfix status
+sudo dpkg-reconfigure postfix
+
+#Configure Postfix:
+
+1. Select the configuration type:
+
+Choose the Internet Site mail configuration type. Press TAB to select Ok and Enter to confirm.
+
+2. Enter the system mail name:
+
+The system mail name is a fully qualified domain name (FQDN) that the system uses in banners, delivery status notifications, etc.
+
+Enter the system mail name and press Tab to select Ok and Enter to confirm
+
+#Configure Mail:
+
+sudo nano /etc/postfix/sasl/sasl_passwd
+[smtp.gmail.com]:587 username:password
+Replace username and password with the SMTP provider credentials. You can also specify an API key if the provider allows it.
+
+Save the changes and exit.
+sudo postmap /etc/postfix/sasl_passwd
+
+#Configure Main postfix config file :
+
+sudo nano /etc/postfix/main.cf
+
+#Set up Relay Server:
+
+relayhost = [smtp.gmail.com]:587
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd
+smtp_use_tls = yes
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
+#Provide permissions:
+
+sudo chown root:root /etc/postfix/sasl/sasl_passwd /etc/postfix/sasl/sasl_passwd.db
+sudo -R chmod 600 /etc/postfix
+
+# Increase allowed file size limit(max-50MB):
+
+sudo postconf -e 'message_size_limit = 30720000' 
+sudo systemctl restart postfix
+
+# send mail:
+
+echo "This is the email body." | mail -s "Email subject" -a "From: youraddress@domain.com" recipient@domain.com
+
+#Check logs for verification/error:
+Make entry of mail configuration in Main.cf file:
+maillog_file = /var/log/mail.log 
+
+Mail  logs: sudo tail -f /var/log/mail.log
+
+#if need to reconfigure host :
+
+sudo vim /etc/hosts
+127.0.0.1 localhost localhost.localdomain
+::1 localhost localhost.localdomain
+
+#How to generate app Password for Gmail:
+
+https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237
