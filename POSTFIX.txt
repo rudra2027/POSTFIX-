@@ -56,6 +56,14 @@ sudo systemctl restart postfix
 echo "This is the email body." | mail -s "Email subject" -a "From: youraddress@domain.com" recipient@domain.com
 #With attachments :
 echo "This is the email body." |mail -s "[subject]" -A [file_path] -a "From: youraddress@domain.com" recipient@domain.com
+#To read mail:
+mail
+#Send mail to multiple receivers
+mail -s "[subject]" [recipient1], [recipient2] <<< "[mail body]"
+#Send Email from File
+mail -s "[subject]" [recipient] < [file_path]
+
+
 #Check logs for verification/error:
 Make entry of mail configuration in Main.cf file:
 maillog_file = /var/log/mail.log 
